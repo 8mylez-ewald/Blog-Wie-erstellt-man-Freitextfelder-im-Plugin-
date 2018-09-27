@@ -24,10 +24,24 @@ class EmzAttribute extends Plugin
     public function install(InstallContext $context)
     {
         parent::install($context);
+
+        $service = $this->container->get('shopware_attribute.crud_service');
+        $service->update('s_articles_attributes', 'emz_fsk', 'integer', [
+            'label' => 'Artikel ist ein FSK Artikel',
+            'displayInBackend' => true,
+            'translateable' => true,
+            'position' => 1,
+            'custom' => false,
+        ]);
+
+        $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCacheImpl();
+        $metaDataCache->deleteAll();
+        $this->container->get('models')->generateAttributeModels(['s_articles_attributes']);
+
+        $context->scheduleClearCache(InstallContext::CACHE_LIST_DEFAULT);
     }
 
     public function uninstall(UninstallContext $context)
     {
         parent::uninstall($context);
-    }
 }
