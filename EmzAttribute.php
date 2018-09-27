@@ -44,4 +44,12 @@ class EmzAttribute extends Plugin
     public function uninstall(UninstallContext $context)
     {
         parent::uninstall($context);
+
+        $service = $this->container->get('shopware_attribute.crud_service');
+        $service->delete('s_articles_attributes', 'emz_fsk');
+
+        $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCacheImpl();
+        $metaDataCache->deleteAll();
+        $this->container->get('models')->generateAttributeModels(['s_articles_attributes']);
+    }
 }
