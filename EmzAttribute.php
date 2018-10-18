@@ -17,16 +17,13 @@ class EmzAttribute extends Plugin
     */
     public function build(ContainerBuilder $container)
     {
-        $container->setParameter('emz_attribute.plugin_dir', $this->getPath());
         parent::build($container);
     }
 
     public function install(InstallContext $context)
     {
-        parent::install($context);
-
         $service = $this->container->get('shopware_attribute.crud_service');
-        $service->update('s_articles_attributes', 'emz_fsk', 'integer', [
+        $service->update('s_articles_attributes', 'emz_fsk', 'boolean', [
             'label' => 'Artikel ist ein FSK Artikel',
             'displayInBackend' => true,
             'translateable' => true,
@@ -38,18 +35,20 @@ class EmzAttribute extends Plugin
         $metaDataCache->deleteAll();
         $this->container->get('models')->generateAttributeModels(['s_articles_attributes']);
 
+        parent::install($context);
+
         $context->scheduleClearCache(InstallContext::CACHE_LIST_DEFAULT);
     }
 
     public function uninstall(UninstallContext $context)
     {
-        parent::uninstall($context);
-
         $service = $this->container->get('shopware_attribute.crud_service');
         $service->delete('s_articles_attributes', 'emz_fsk');
 
         $metaDataCache = $this->container->get('models')->getConfiguration()->getMetadataCacheImpl();
         $metaDataCache->deleteAll();
         $this->container->get('models')->generateAttributeModels(['s_articles_attributes']);
+
+        parent::uninstall($context);
     }
 }
